@@ -28,7 +28,7 @@ export const heroSlides: HeroSlide[] = [
     title: "IS & IT Audit, Built for the Regulator's Desk",
     summary:
       "IS audits mapped to RBI ITGRCA, SEBI CSCRF and IRDAI — with findings and evidence a regulator will accept.",
-    image: "/images/home/hero-audit.jpg",
+    image: "/images/home/hero-audit-wide.jpg",
     href: "/services/is-it-audit",
     cta: "Explore more",
   },
@@ -37,7 +37,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Security Testing That Stands Up to Scrutiny",
     summary:
       "CERT-In-aligned security audits, VAPT and resilience testing — documented to a standard that stands up to scrutiny.",
-    image: "/images/home/hero-cyber.jpg",
+    image: "/images/home/hero-cyber-wide.jpg",
     href: "/services/cyber-security",
     cta: "Explore more",
   },
@@ -46,7 +46,7 @@ export const heroSlides: HeroSlide[] = [
     title: "Risk, GRC & Forensics on One Evidence Trail",
     summary:
       "ISO 27001, SOC 2, internal controls, DPDP readiness and FAFD-led digital forensics with defensible chain-of-custody.",
-    image: "/images/home/hero-forensics.jpg",
+    image: "/images/home/hero-forensics-wide.jpg",
     href: "/services/risk-grc-advisory",
     cta: "Explore more",
   },
@@ -61,6 +61,8 @@ export const expertise: {
   desc: string;
   href: string;
   image?: string;
+  imageWidth?: number;
+  imageHeight?: number;
   imagePos?: "left" | "right";
 }[] = [
   {
@@ -69,6 +71,8 @@ export const expertise: {
     desc: "RBI ITGRCA, SEBI CSCRF and IRDAI assurance, evidence attached.",
     href: "/services/is-it-audit",
     image: "/images/home/hero-audit.jpg",
+    imageWidth: 1071,
+    imageHeight: 941,
   },
   {
     no: "02",
@@ -76,6 +80,8 @@ export const expertise: {
     desc: "CERT-In-aligned security audits, VAPT and resilience testing.",
     href: "/services/cyber-security",
     image: "/images/home/hero-cyber.jpg",
+    imageWidth: 1071,
+    imageHeight: 941,
   },
   {
     no: "03",
@@ -83,6 +89,8 @@ export const expertise: {
     desc: "ISO 27001, SOC 2, NIST, COBIT and internal controls.",
     href: "/services/risk-grc-advisory",
     image: "/images/home/hero-grc.jpg",
+    imageWidth: 1071,
+    imageHeight: 941,
   },
   {
     no: "04",
@@ -90,6 +98,8 @@ export const expertise: {
     desc: "Evidence collection, monitoring and workpaper drafting.",
     href: "/services/ai-automation",
     image: "/images/home/hero-ai.jpg",
+    imageWidth: 1071,
+    imageHeight: 941,
   },
   {
     no: "05",
@@ -97,6 +107,8 @@ export const expertise: {
     desc: "Fraud examination and defensible chain-of-custody.",
     href: "/services/digital-forensics",
     image: "/images/home/hero-forensics.jpg",
+    imageWidth: 1071,
+    imageHeight: 941,
   },
   {
     no: "06",
@@ -104,6 +116,8 @@ export const expertise: {
     desc: "Ongoing security and compliance operations, as a service.",
     href: "/services/managed-services",
     image: "/images/home/hero-managed.jpg",
+    imageWidth: 1071,
+    imageHeight: 941,
   },
 ];
 

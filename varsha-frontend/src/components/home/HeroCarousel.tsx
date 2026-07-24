@@ -7,12 +7,12 @@ import { ChevronDown, ChevronLeft, ChevronRight, Play } from "lucide-react";
 import { cn } from "../ui/cn";
 import { heroSlides } from "./homeData";
 
-// Direction C hero — abstract Big-4-style ground (bg-hero-scene) with
-// full-width light-weight display headline, thin white hairline rule,
-// summary, chip CTA. Slide 1 speaks for the company; the rest carry the
-// practice lines. Bottom chrome: centered "Scroll Down" with an accent
-// progress track, bare chevron arrows bottom-right. Auto-advances every 8s;
-// paused on hover, off under prefers-reduced-motion.
+// Direction C hero — photographic ground (hero-network.jpg) darkened with
+// bg-hero-shade, full-width light-weight display headline, thin white
+// hairline rule, summary, chip CTA. Slide 1 speaks for the company; the
+// rest carry the practice lines. Bottom chrome: centered "Scroll Down" with
+// an accent progress track, bare chevron arrows bottom-right. Auto-advances
+// every 8s; paused on hover, off under prefers-reduced-motion.
 
 const SLIDE_COUNT = heroSlides.length;
 // Static classes per slide index — house rule: no style= in shipped React.
@@ -54,9 +54,18 @@ export default function HeroCarousel() {
       onMouseLeave={() => setPaused(false)}
       className="relative min-h-[45rem] overflow-hidden bg-hero text-white lg:h-screen"
     >
-      {/* abstract Big-4-style ground — navy gradient, precision grid, light
-          beams (no artwork; client dropped the monument photo 2026-07-22) */}
-      <div aria-hidden="true" className="absolute inset-0 bg-hero-scene" />
+      {/* photographic ground: full-bleed image + darkening shade for text legibility */}
+      <div aria-hidden="true" className="absolute inset-0">
+        <Image
+          src="/images/home/hero-network.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+      </div>
+      <div aria-hidden="true" className="absolute inset-0 bg-hero-shade" />
 
       {/* active slide — keyed so the rise animation restarts */}
       <div className="relative z-20 mx-auto flex h-full min-h-[45rem] max-w-content items-center px-6 pb-32 pt-28 md:px-12 lg:h-screen">

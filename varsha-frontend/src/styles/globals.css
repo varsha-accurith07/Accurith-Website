@@ -84,6 +84,17 @@
       );
   }
 
+  /* Hero photo shade — darkens the background photo left-to-right so the
+     headline stays legible; mirrors the approved mockup treatment. */
+  .bg-hero-shade {
+    background-image: linear-gradient(
+      100deg,
+      theme(colors.hero / 88%) 0%,
+      theme(colors.hero / 58%) 45%,
+      theme(colors.hero / 28%) 100%
+    );
+  }
+
   /* Legacy Direction A dot-grid, recolored to the Direction C accent —
      whisper-quiet (~4–6% opacity); only still referenced by unreskinned spots. */
   .bg-audit-grid {

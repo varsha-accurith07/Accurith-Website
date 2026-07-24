@@ -29,21 +29,22 @@ export default function ExpertiseList() {
           </Link>
         </div>
 
-        <ul className="grid gap-0.5 bg-line-light sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {expertise.map((e) => (
             <li key={e.no} className="group relative">
               <Link
                 href={e.href}
-                className="relative block aspect-[4/3.4] overflow-hidden bg-navy"
+                className="relative block overflow-hidden bg-navy"
               >
                 {e.image && (
                   <Image
                     src={e.image}
                     alt=""
-                    fill
+                    width={e.imageWidth}
+                    height={e.imageHeight}
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                     className={cn(
-                      "object-cover transition-transform duration-500 motion-safe:group-hover:scale-105",
+                      "block h-auto w-full transition-transform duration-500 motion-safe:group-hover:scale-105",
                       e.imagePos && posClasses[e.imagePos],
                     )}
                   />
