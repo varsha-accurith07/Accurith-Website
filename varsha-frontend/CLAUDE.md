@@ -1,5 +1,23 @@
 # CLAUDE.md — Accurith Website Project Knowledge
 
+> # 🛑 THIS FOLDER IS NO LONGER THE SITE
+>
+> As of 2026-07-25 (`feat/integrate-direction-c`) this frontend was merged
+> into **`Srujana Backend/`**, which is now the only app that builds and
+> deploys. `varsha-frontend/` is kept as a reference copy of the Direction C
+> source and nothing depends on it.
+>
+> **Edits made here do not reach the site.** Work in `Srujana Backend/`
+> instead, and read **`Srujana Backend/CLAUDE.md`** — it is the authoritative
+> project doc and supersedes this file.
+>
+> Everything below describes the **retired** architecture: Cloudflare Pages,
+> `output: 'export'`, Pages Functions, Zoho CRM. All of it is dead. The live
+> stack is Railway + Node + Postgres + nodemailer, behind Cloudflare for DNS,
+> CDN and WAF only.
+
+---
+
 > **⚠️ INSTRUCTION TO CLAUDE (READ FIRST):**
 > This file is **PROJECT KNOWLEDGE ONLY**. Do **NOT** implement, scaffold, generate, or modify any code based on this file on your own initiative.
 > Development has **not started yet**. Until Varsha or Srujana explicitly asks you to build a specific task (e.g., "implement V05" or "help me with S08"), your only job is to **know** this context and use it to answer questions accurately.

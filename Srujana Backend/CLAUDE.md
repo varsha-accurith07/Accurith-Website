@@ -195,6 +195,19 @@ Response 400 / 413 / 415 / 429 / 500 with `{ "success": false, "error": "…" }`
 ### `GET /api/careers/openings`
 Returns `{ openings: [ { id, slug, title, department, location, employmentType, descriptionMd, postedAt } ] }`. `isOpen = true` only. Cached 60s public.
 
+### `POST /api/early-access`
+```jsonc
+{
+  "name":    "string, 1–200",
+  "email":   "email, ≤254",
+  "product": "string, 1–200",   // label from the Products page select
+  "website": ""                 // honeypot
+}
+```
+Response 200 `{ "success": true }` on insert, on honeypot, AND on a repeat
+signup — `EarlyAccessRequest` is unique on `(email, product)`, and someone
+signing up twice is already on the list, which is what they asked for.
+
 ---
 
 ## 8. Privacy — open questions (S23 territory)
@@ -219,16 +232,44 @@ We now store personal data. **These are decisions for the client, not me:**
 
 ---
 
-## 9. Two-directory reality check
+## 9. Two-directory reality check — MERGED
 
-Repo still has two sibling scaffolds:
+The merge described here happened on `feat/integrate-direction-c`
+(2026-07-25), in the documented direction: Varsha's components, 23 page
+routes, `globals.css` and brand assets moved INTO this project. This is now
+the only app that renders the site.
 
-- `Srujana Backend/` — this project (canonical: DB, API, security, CSP,
-  Prisma, nodemailer)
-- `varsha-frontend/` — Varsha's separate scaffold (own next.config, own
-  package.json, own CLAUDE.md that still describes the static architecture)
+`varsha-frontend/` still exists and still builds, but nothing depends on it.
+It is a reference copy of the Direction C source, pending a team decision to
+delete it. **Do not develop there** — changes made in that folder do not
+reach the site.
 
-They must merge before ship. Direction: pull Varsha's `/src/components/`,
-her `page.tsx` files, her `globals.css`, and her brand assets INTO this
-project. Everything infrastructural is here. Flag the merge day so we don't
-each spend a week diverging further.
+What changed in this project as a result:
+
+- `globals.css` carries the full Direction C token set in `@theme`, ported
+  from Varsha's old Tailwind v3 config. Still v4, still no
+  `tailwind.config.ts` (rule #11 holds).
+- `src/components/blog/blogData.ts` is a display-shaped view over
+  `src/lib/blog.ts`. Posts live in `/content/blog/*.mdx` and render through
+  `/blog/[slug]`. `BlogPostMeta` gained `category`, `readTime`,
+  `displayDate`, `featured`, `image`, `imageAlt`, `imagePos` — additive only,
+  the three exported function signatures are unchanged.
+- All three forms now POST to real routes. No mocks remain; `src/mocks/` is
+  gone.
+- `sitemap.ts` was advertising `/careers`, `/resources/blog`,
+  `/services/risk-grc`, `/services/managed` and `/solutions`, none of which
+  exist. Now matched to the real tree — keep it that way when routes move.
+
+### Still open
+
+- **DB write path is unverified.** Every route was exercised to the point of
+  the Prisma call, but no Postgres was available, so no insert or SMTP send
+  has ever succeeded. Run `db:migrate:deploy` then re-test all three forms
+  before trusting them.
+- **Migration `20260725000000_add_early_access_request` has never been
+  applied.** It was generated offline via `prisma migrate diff`.
+- **`/kitchen-sink` is publicly reachable.** It is an internal component
+  gallery, kept out of the sitemap but not out of the crawl. Decide whether
+  to noindex or drop it before launch.
+- **Leadership cards on `/about` are placeholders** pending real bios, photos
+  and certifications from the client.

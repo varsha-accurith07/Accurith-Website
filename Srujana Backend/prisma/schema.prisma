@@ -1,6 +1,6 @@
 // Prisma schema — see https://pris.ly/d/prisma-schema
 //
-// Three tables. Deliberately boring. We are a five-enquiries-a-week prototype
+// Four tables. Deliberately boring. We are a five-enquiries-a-week prototype
 // and I read records via Railway's Postgres dashboard — no admin UI here.
 //
 // Personal data lives in this schema. Retention, right-to-erasure, and
@@ -88,4 +88,34 @@ enum ApplicationStatus {
   REVIEWING
   REJECTED
   HIRED
+}
+
+// EarlyAccessRequest — the Products page waitlist. Products are "Launching
+// soon", so this is a list of people to write to when they open, not a
+// purchase intent. `product` is a free-text label rather than a relation:
+// the product line is not settled and a table of two rows would be premature.
+//
+// Deliberately narrower than Consultation — name, email and which product.
+// We promised on the form that we would write about nothing else, so we
+// collect nothing else.
+model EarlyAccessRequest {
+  id        String                @id @default(cuid())
+  createdAt DateTime              @default(now())
+
+  name    String
+  email   String
+  product String
+
+  status  EarlyAccessStatus     @default(NEW)
+
+  // One person may register interest in more than one product, but not twice
+  // for the same one.
+  @@unique([email, product])
+  @@index([createdAt])
+}
+
+enum EarlyAccessStatus {
+  NEW
+  INVITED
+  CLOSED
 }

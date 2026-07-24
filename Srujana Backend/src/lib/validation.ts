@@ -76,3 +76,14 @@ export const applicationSchema = z.object({
   website: honeypot,
 });
 export type ApplicationInput = z.infer<typeof applicationSchema>;
+
+// Products early-access waitlist — matches /api/early-access body.
+// Narrow on purpose: the form promises we will write about nothing else, so
+// there is nothing else to collect.
+export const earlyAccessSchema = z.object({
+  name: shortText,
+  email,
+  product: shortText,
+  website: honeypot,
+});
+export type EarlyAccessInput = z.infer<typeof earlyAccessSchema>;

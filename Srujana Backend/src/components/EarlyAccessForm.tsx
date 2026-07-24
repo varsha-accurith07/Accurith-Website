@@ -4,24 +4,53 @@ import { useState } from "react";
 import { CheckCircle2, CircleAlert, LoaderCircle } from "lucide-react";
 import Button from "./ui/Button";
 import { cn } from "./ui/cn";
-import { submitEarlyAccess } from "@/mocks/earlyAccess";
 
 type FormStatus = "idle" | "loading" | "success" | "error";
 
 const inputClasses =
   "w-full border border-line-light bg-white px-4 py-3 text-base text-ink placeholder:text-ink-3 transition-colors duration-200 hover:border-ink-3 focus:border-accent focus:outline-none";
 
-// V24 — simple early-access form against the mocked endpoint. Append ?fail
-// to the URL to demo the error state.
+const GENERIC_ERROR = "That didn't go through. Please try again, or email";
+const RATE_LIMIT_ERROR =
+  "You've submitted this a few times in a short window, so we've paused new ones for a few minutes. Please try again shortly, or email";
+
+// V24 / J01 — early-access waitlist against POST /api/early-access. Signing up
+// twice for the same product is a no-op server-side, so it still reports
+// success.
 export default function EarlyAccessForm({ products }: { products: string[] }) {
   const [status, setStatus] = useState<FormStatus>("idle");
-  const [form, setForm] = useState({ name: "", email: "", product: "" });
+  const [errorText, setErrorText] = useState(GENERIC_ERROR);
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    product: "",
+    // Honeypot — see the hidden field below.
+    website: "",
+  });
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setStatus("loading");
-    const result = await submitEarlyAccess(form);
-    setStatus(result.success ? "success" : "error");
+
+    try {
+      const res = await fetch("/api/early-access", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data: { success?: boolean } = await res.json().catch(() => ({}));
+
+      if (res.ok && data.success) {
+        setStatus("success");
+        return;
+      }
+
+      setErrorText(res.status === 429 ? RATE_LIMIT_ERROR : GENERIC_ERROR);
+      setStatus("error");
+    } catch {
+      setErrorText(GENERIC_ERROR);
+      setStatus("error");
+    }
   }
 
   if (status === "success") {
@@ -99,6 +128,21 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
             ))}
           </select>
         </div>
+        {/* Honeypot. sr-only rather than `hidden` — display:none fields are
+            commonly skipped by bots, which defeats the trap. */}
+        <div className="sr-only" aria-hidden="true">
+          <label htmlFor="ea-website">Website</label>
+          <input
+            id="ea-website"
+            type="text"
+            tabIndex={-1}
+            autoComplete="off"
+            value={form.website}
+            onChange={(e) =>
+              setForm((f) => ({ ...f, website: e.target.value }))
+            }
+          />
+        </div>
       </div>
 
       {status === "error" && (
@@ -113,7 +157,7 @@ export default function EarlyAccessForm({ products }: { products: string[] }) {
             className="shrink-0 text-red-600"
           />
           <p className="text-sm leading-relaxed text-red-800">
-            That didn&apos;t go through. Please try again, or email{" "}
+            {errorText}{" "}
             <a
               href="mailto:hello@accurith.com"
               className="font-medium underline underline-offset-2"
