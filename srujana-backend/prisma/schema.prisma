@@ -1,0 +1,113 @@
+// Prisma schema — see https://pris.ly/d/prisma-schema
+//
+// Three tables. Deliberately boring. We are a five-enquiries-a-week prototype
+// and I read records via Railway's Postgres dashboard — no admin UI here.
+//
+// Personal data lives in this schema. Retention, right-to-erasure, and
+// residency policies are open items — see CLAUDE.md §Privacy.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Consultation — a "Book a consultation" enquiry from the marketing site.
+model Consultation {
+  id        String              @id @default(cuid())
+  createdAt DateTime            @default(now())
+
+  name    String
+  email   String
+  company String
+  role    String
+  service String
+  message String              @db.Text
+
+  status  ConsultationStatus  @default(NEW)
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+enum ConsultationStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+// EarlyAccess — a "request early access" submission from the Products page.
+// Varsha's EarlyAccessForm posts { name, email, product } to /api/early-access.
+model EarlyAccess {
+  id        String            @id @default(cuid())
+  createdAt DateTime          @default(now())
+
+  name      String
+  email     String
+  product   String
+
+  status    EarlyAccessStatus @default(NEW)
+
+  @@index([email])
+  @@index([createdAt])
+}
+
+enum EarlyAccessStatus {
+  NEW
+  CONTACTED
+  CLOSED
+}
+
+// JobOpening — powers the /careers page. Varsha's page reads this via
+// GET /api/careers/openings. I add/edit openings via Railway's Postgres
+// dashboard (or `npx prisma studio` locally).
+model JobOpening {
+  id             String       @id @default(cuid())
+  slug           String       @unique
+  title          String
+  department     String
+  location       String
+  employmentType String
+  descriptionMd  String       @db.Text
+  isOpen         Boolean      @default(true)
+  postedAt       DateTime     @default(now())
+
+  applications   JobApplication[]
+
+  @@index([isOpen, postedAt])
+}
+
+// JobApplication — a submission to one of the JobOpenings. Applicants give a
+// LinkedIn / Drive / portfolio URL. We do NOT accept file uploads in this
+// phase: an endpoint that takes arbitrary binaries from strangers is the
+// first thing a buyer's pentest flags, and this is a cyber-security firm.
+model JobApplication {
+  id           String              @id @default(cuid())
+  createdAt    DateTime            @default(now())
+
+  openingId    String
+  opening      JobOpening          @relation(fields: [openingId], references: [id], onDelete: Restrict)
+
+  name         String
+  email        String
+  phone        String
+  linkedinUrl  String
+  portfolioUrl String?
+  coverNote    String              @db.Text
+
+  status       ApplicationStatus   @default(NEW)
+
+  @@index([email])
+  @@index([createdAt])
+  @@index([openingId, status])
+}
+
+enum ApplicationStatus {
+  NEW
+  REVIEWING
+  REJECTED
+  HIRED
+}

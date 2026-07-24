@@ -1,0 +1,48 @@
+name: Frontend Guard
+
+# varsha-frontend/ is Varsha's area. This check fails (red X) whenever
+# anyone else modifies files under it, on any push or pull request.
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for frontend changes by non-owners
+        env:
+          ACTOR: ${{ github.actor }}
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          FRONTEND_OWNER="varsha-accurith07"
+
+          if [ "$ACTOR" = "$FRONTEND_OWNER" ]; then
+            echo "Actor is the frontend owner — guard passed."
+            exit 0
+          fi
+
+          # New branch pushes have an all-zero "before" SHA; diff against main instead
+          if [ -z "$BASE_SHA" ] || ! git cat-file -e "$BASE_SHA" 2>/dev/null; then
+            git fetch origin main --quiet
+            BASE_SHA=$(git merge-base origin/main HEAD)
+          fi
+
+          CHANGED=$(git diff --name-only "$BASE_SHA" HEAD -- varsha-frontend/)
+
+          if [ -n "$CHANGED" ]; then
+            echo "::error::varsha-frontend/ is owned by @$FRONTEND_OWNER. Backend branches must not modify these files:"
+            echo "$CHANGED"
+            exit 1
+          fi
+
+          echo "No changes under varsha-frontend/ — guard passed."

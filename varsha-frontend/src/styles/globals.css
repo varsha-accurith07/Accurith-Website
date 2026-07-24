@@ -1,0 +1,167 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-white font-body text-ink-2 antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-heading text-ink;
+  }
+
+  ::selection {
+    @apply bg-accent text-white;
+  }
+
+  /* Visible focus ring on every interactive element, site-wide. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2;
+  }
+  .bg-base :focus-visible,
+  .bg-footer :focus-visible,
+  .bg-navy :focus-visible,
+  .bg-navy-dark :focus-visible {
+    @apply ring-accent-light ring-offset-base;
+  }
+}
+
+@layer utilities {
+  /* Direction C hero scene — abstract Big-4-style ground replacing the
+     monument photo (client request 2026-07-22): deep navy gradient, a faint
+     precision grid, two diagonal light beams and an accent glow. All colors
+     derive from theme tokens; layers stack via comma-separated backgrounds. */
+  .bg-hero-scene {
+    background-color: theme(colors.hero);
+    background-image:
+      /* fine audit grid, whisper-quiet */
+      repeating-linear-gradient(
+        0deg,
+        theme(colors.white / 2.5%) 0 1px,
+        transparent 1px 72px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        theme(colors.white / 2.5%) 0 1px,
+        transparent 1px 72px
+      ),
+      /* diagonal light beams */
+      linear-gradient(
+        112deg,
+        transparent 42%,
+        theme(colors.accent.DEFAULT / 7%) 50%,
+        transparent 58%
+      ),
+      linear-gradient(
+        112deg,
+        transparent 64%,
+        theme(colors.accent.light / 5%) 72%,
+        transparent 80%
+      ),
+      /* accent glow upper right + depth glow lower left */
+      radial-gradient(
+        ellipse 55% 65% at 78% 18%,
+        theme(colors.accent.DEFAULT / 22%),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 50% at 12% 96%,
+        theme(colors.navy.DEFAULT / 85%),
+        transparent 72%
+      ),
+      /* base navy→ink wash */
+      linear-gradient(
+        115deg,
+        theme(colors.navy.DEFAULT) 0%,
+        theme(colors.hero) 58%,
+        theme(colors.navy.dark) 100%
+      );
+  }
+
+  /* Legacy Direction A dot-grid, recolored to the Direction C accent —
+     whisper-quiet (~4–6% opacity); only still referenced by unreskinned spots. */
+  .bg-audit-grid {
+    background-image: radial-gradient(
+      circle,
+      theme(colors.accent.DEFAULT / 6%) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+  }
+  .bg-audit-grid-navy {
+    background-image: radial-gradient(
+      circle,
+      theme(colors.accent.light / 8%) 1px,
+      transparent 1px
+    );
+    background-size: 28px 28px;
+  }
+}
+
+@layer components {
+  /* Legacy corner-tick marks, recolored to the Direction C accent. */
+  .corner-ticks {
+    position: relative;
+  }
+  .corner-ticks::before,
+  .corner-ticks::after {
+    content: "";
+    position: absolute;
+    width: theme(spacing.2);
+    height: theme(spacing.2);
+    border-color: theme(colors.accent.DEFAULT / 50%);
+    pointer-events: none;
+  }
+  .corner-ticks::before {
+    top: -1px;
+    left: -1px;
+    border-top: 1px solid;
+    border-left: 1px solid;
+  }
+  .corner-ticks::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+  }
+}
+
+/* V28 — scroll-reveal. Elements with [data-reveal] start hidden and slide up
+   ~12px when .is-revealed is added by the useScrollReveal hook. Fully disabled
+   under prefers-reduced-motion (and never used on the Trust page). */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(12px);
+    transition:
+      opacity 300ms ease-out,
+      transform 300ms ease-out;
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  [data-reveal].is-revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Direction B entrance: hero slide content rises 18px on carousel change.
+     Applied via .anim-rise; keyed remounts restart it. */
+  .anim-rise {
+    animation: rise 0.55s ease;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}

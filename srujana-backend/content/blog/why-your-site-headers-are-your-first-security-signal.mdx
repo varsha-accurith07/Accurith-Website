@@ -1,0 +1,30 @@
+---
+title: 'Why your site headers are your first security signal'
+date: '2026-07-17'
+author: 'Srujana Vellanki'
+tags: ['security', 'appsec', 'trust']
+excerpt: 'Before a CISO reads a word of your marketing copy, their browser has already told them what kind of firm you are. Here''s what the headers say — and how to make them say the right thing.'
+draft: false
+---
+
+Every enterprise buyer of a security service does the same thing before the first meeting: they open your site with DevTools already on the Network tab. In the first HTTP response, before your hero image has finished loading, six headers tell them whether you take your own advice.
+
+## The six that matter
+
+Strict-Transport-Security tells the browser "never speak plain HTTP to me again." Without it, an attacker on the same coffee-shop Wi-Fi can strip your TLS with a `Location:` redirect and your visitor never notices the padlock is gone.
+
+Content-Security-Policy is the browser-side firewall. It's the difference between an XSS bug being an inconvenience and an XSS bug being a full account takeover — because a strict CSP says which origins may run script, and everything else silently fails.
+
+X-Frame-Options and its modern sibling `frame-ancestors` block the "invisible iframe over your login button" clickjacking pattern. Your bank has had this since 2010. So should you.
+
+X-Content-Type-Options: nosniff kills a small but persistent class of "uploaded .txt gets executed as .js" attacks. It costs nothing and there is no reason not to send it.
+
+Referrer-Policy: strict-origin-when-cross-origin stops your URLs from leaking into third-party analytics and Google Search referer logs. Any query-string secret you might carry is now not another company's problem.
+
+Permissions-Policy is a denylist for browser features you don't use — camera, mic, geolocation, payment. If an attacker ever injects script, they still can't reach the hardware.
+
+## The honest part
+
+We ship all six on this site (see `/public/_headers`). We do it not because it makes us secure — many other things make a site secure — but because sending them is the cheapest, most visible proof that we know what we're doing.
+
+If your own vendor's site doesn't send them, ask why.
