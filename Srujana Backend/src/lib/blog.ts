@@ -19,10 +19,22 @@ export interface BlogPostMeta {
   slug: string;
   title: string;
   date: string; // ISO YYYY-MM-DD
+  /** Month-level display form of `date`, e.g. "July 2026". */
+  displayDate: string;
   author: string;
   tags: string[];
   excerpt: string;
   draft: boolean;
+  // ---- Display fields (J01). Varsha's cards and PostShell render these.
+  /** Kicker above the title, e.g. "IS Audit". Falls back to the first tag. */
+  category: string;
+  /** Explicit frontmatter value wins; otherwise computed from word count. */
+  readTime: string;
+  featured: boolean;
+  image?: string;
+  imageAlt?: string;
+  /** Crop side for wide artwork (maps to object-left/right, never style=). */
+  imagePos?: 'left' | 'right';
 }
 
 export interface BlogPost extends BlogPostMeta {
@@ -45,10 +57,44 @@ function readAllFrontmatter(): { file: string; slug: string; data: matter.GrayMa
     });
 }
 
+const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+// Parsed off the string rather than through `new Date()` on purpose: a bare
+// "2026-07-18" is parsed as UTC midnight, which renders as the previous month
+// for anyone west of Greenwich on the 1st.
+function toDisplayDate(iso: string): string {
+  const [year, month] = iso.split('-');
+  const name = MONTHS[Number(month) - 1];
+  return name ? `${name} ${year}` : iso;
+}
+
+// ~200 wpm is the usual reading-speed assumption for prose of this kind.
+function estimateReadTime(content: string): string {
+  const words = content.trim().split(/\s+/).filter(Boolean).length;
+  return `${Math.max(1, Math.round(words / 200))} min read`;
+}
+
+function titleCase(s: string): string {
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 // Guardrails: every field the site expects must be present with the correct
 // type. Throws loudly at build time — a missing `date` on a live post should
 // break the build, not silently render as "undefined".
-function toMeta(slug: string, fm: Record<string, unknown>): BlogPostMeta {
+function toMeta(slug: string, fm: Record<string, unknown>, content: string): BlogPostMeta {
   const missing: string[] = [];
   const need = (k: string) => {
     if (fm[k] === undefined || fm[k] === null) missing.push(k);
@@ -62,20 +108,29 @@ function toMeta(slug: string, fm: Record<string, unknown>): BlogPostMeta {
   }
   const rawTags = fm.tags;
   const tags = Array.isArray(rawTags) ? rawTags.map(String) : [];
+  const date = String(fm.date);
+  const imagePos = fm.imagePos === 'left' || fm.imagePos === 'right' ? fm.imagePos : undefined;
   return {
     slug,
     title: String(fm.title),
-    date: String(fm.date),
+    date,
+    displayDate: toDisplayDate(date),
     author: String(fm.author),
     tags,
     excerpt: String(fm.excerpt),
     draft: Boolean(fm.draft ?? false),
+    category: fm.category ? String(fm.category) : tags[0] ? titleCase(tags[0]) : 'Notes',
+    readTime: fm.readTime ? String(fm.readTime) : estimateReadTime(content),
+    featured: Boolean(fm.featured ?? false),
+    image: fm.image ? String(fm.image) : undefined,
+    imageAlt: fm.imageAlt ? String(fm.imageAlt) : undefined,
+    imagePos,
   };
 }
 
 export function getAllPosts(): BlogPostMeta[] {
   return readAllFrontmatter()
-    .map(({ slug, data }) => toMeta(slug, data.data))
+    .map(({ slug, data }) => toMeta(slug, data.data, data.content))
     .filter((p) => !p.draft)
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
@@ -89,7 +144,7 @@ export function getPostBySlug(slug: string | undefined): BlogPost | null {
   const file = path.join(CONTENT_DIR, `${slug}.mdx`);
   if (!fs.existsSync(file)) return null;
   const parsed = matter(fs.readFileSync(file, 'utf8'));
-  const meta = toMeta(slug, parsed.data);
+  const meta = toMeta(slug, parsed.data, parsed.content);
   if (meta.draft) return null;
   return { ...meta, source: parsed.content };
 }

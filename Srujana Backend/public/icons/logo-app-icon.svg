@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Accurith app icon / social avatar — mark on Trust Navy rounded square -->
+  <rect width="64" height="64" rx="14" fill="#0B1E3D"/>
+  <mask id="cut" maskUnits="userSpaceOnUse" x="0" y="0" width="64" height="64">
+    <path d="M32 5 59 55H5Z" fill="#fff"/>
+    <path d="M12 33 27.5 48.5 58 18" fill="none" stroke="#000" stroke-width="8"/>
+  </mask>
+  <g transform="translate(9 9) scale(0.71875)">
+    <path d="M32 5 59 55H5Z" fill="#FFFFFF" mask="url(#cut)"/>
+    <circle cx="54.5" cy="21.5" r="5" fill="#3E8EFF"/>
+  </g>
+</svg>

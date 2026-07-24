@@ -2,14 +2,15 @@ import type { MetadataRoute } from 'next';
 import { SITE_URL } from '@/lib/metadata';
 import { getAllPosts } from '@/lib/blog';
 
-// Required under `output: 'export'` — tells Next.js this is a build-time
-// artifact, not a runtime route handler.
+// Build-time artifact rather than a runtime route handler.
 export const dynamic = 'force-static';
 
-// Static routes we always want indexed. Varsha will add more as she wires
-// pages — keep this list in sync with the /src/app/**/page.tsx tree. Anything
-// missing here is NOT excluded from indexing (robots controls that), it just
-// isn't submitted to Google as a preferred URL.
+// Static routes we always want indexed. Keep this list in sync with the
+// /src/app/**/page.tsx tree — a sitemap that advertises 404s is worse than no
+// sitemap. Anything missing here is NOT excluded from indexing (robots
+// controls that), it just isn't submitted to Google as a preferred URL.
+//
+// Deliberately absent: /kitchen-sink, which is an internal component gallery.
 const STATIC_ROUTES = [
   '/',
   '/services',
@@ -17,15 +18,14 @@ const STATIC_ROUTES = [
   '/services/is-it-audit',
   '/services/ai-automation',
   '/services/digital-forensics',
-  '/services/risk-grc',
-  '/services/managed',
-  '/solutions',
+  '/services/risk-grc-advisory',
+  '/services/managed-services',
   '/products',
   '/trust',
   '/trust/report-vulnerability',
   '/about',
-  '/careers',
-  '/resources/blog',
+  '/about/careers',
+  '/blog',
   '/contact',
   '/legal/privacy',
   '/legal/terms',
@@ -42,7 +42,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: path === '/' ? 1.0 : 0.7,
   }));
   const blogEntries: MetadataRoute.Sitemap = getAllPosts().map((p) => ({
-    url: new URL(`/resources/blog/${p.slug}`, SITE_URL).toString(),
+    url: new URL(`/blog/${p.slug}`, SITE_URL).toString(),
     lastModified: new Date(p.date),
     changeFrequency: 'yearly',
     priority: 0.5,
