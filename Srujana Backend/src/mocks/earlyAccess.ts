@@ -1,5 +1,6 @@
-// Mock of the Products early-access endpoint (real one lands with Srujana's
-// track). Same conventions as src/mocks/contact.ts.
+// Mock of the Products early-access endpoint — the last form still without a
+// real handler. The consultation and careers forms now POST to live routes;
+// this one needs an endpoint before Products can launch.
 
 export type EarlyAccessPayload = {
   name: string;
